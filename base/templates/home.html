@@ -10,9 +10,18 @@
 </style>
 
     <div class="home_page-container">
+    <div>
+        <div>
+            <p><a href="{% url 'home' %}">All</a></p>
+        </div>
+        {% for topic in topics %}
+            <p><a href="{% url 'home' %}?q={{ topic.name }}">{{ topic.name }} - {{ topic.room_set.count }}</a></p>
+        {% endfor %}
+    </div>
+
         <div>
             {% for room in rooms %}
-                <p>@{{ room.host }}</p>
+                <p>@{{ room.host }} <a href="{% url 'update-room' room.id %}">update room</a></p>
                 <p><a href="{% url 'room' room.id %}">{{ room }}</a></p>
                 <p>{{ room.topic }}</p>
                 <hr>

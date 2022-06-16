@@ -1,3 +1,7 @@
-<a href="{% url 'home' %}">Home Page</a>
-<a href="{% url 'create-room' %}">Create room</a>
+<p><a href="{% url 'home' %}">Home Page</a></p>
+<p><a href="{% url 'create-room' %}">Create room</a></p>
+<br>
+<form method="get" action="{% url 'home' %}">
+    <input type="text" name="q" placeholder="Search for topics or rooms">
+</form>
 <hr>
