@@ -1,10 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+from .forms import RoomForm, MyUserCreationForm, UserForm
 from .models import Room, Topic, Message, User
+from django.contrib import messages
 from django.db.models import Q
-from .forms import RoomForm
 
 
 def home(request):
+    rooms_count = Room.objects.count()
     query = request.GET.get('q') if request.GET.get('q') is not None else ''
     topics = Topic.objects.all()
     rooms = Room.objects.filter(Q(name__icontains=query) |
@@ -12,8 +16,14 @@ def home(request):
                                 Q(description__icontains=query) |
                                 Q(host__username__icontains=query))
 
+    rooms_messages = Message.objects.filter(Q(room__topic__name__icontains=query) |
+                                            Q(room__name__icontains=query) |
+                                            Q(room__host__username__icontains=query))
+
     context = {'rooms': rooms,
-               'topics': topics}
+               'topics': topics,
+               'rooms_count': rooms_count,
+               'rooms_messages': rooms_messages}
     return render(request, 'home.html', context)
 
 
@@ -37,6 +47,7 @@ def room(request, pk):
     return render(request, 'room.html', context)
 
 
+@login_required(login_url='login_user')
 def create_room(request):
     room_form = RoomForm
     page = 'create-room'
@@ -58,6 +69,7 @@ def create_room(request):
     return render(request, 'room_form.html', context)
 
 
+@login_required(login_url='login_user')
 def update_room(request, pk):
     room = Room.objects.get(id=pk)
     topics = Topic.objects.all()
@@ -77,6 +89,7 @@ def update_room(request, pk):
     return render(request, 'room_form.html', context)
 
 
+@login_required(login_url='login_user')
 def delete_room(request, pk):
     room = Room.objects.get(id=pk)
     if request.method == 'POST':
@@ -84,3 +97,42 @@ def delete_room(request, pk):
         return redirect('home')
     context = {'room': room}
     return render(request, 'delete.html', context)
+
+
+def register_user(request):
+    page = 'register'
+    form = MyUserCreationForm
+
+    if request.method == 'POST':
+        form = MyUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            form.save()
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, "An error occurred during registration")
+
+    context = {'page': page,
+               'form': form}
+    return render(request, 'login-register.html', context)
+
+
+def login_user(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+    return render(request, 'login-register.html')
+
+
+@login_required(login_url='login_user')
+def logout_user(request):
+    logout(request)
+    return redirect('home')

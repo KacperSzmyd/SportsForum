@@ -1,7 +1,12 @@
 <p><a href="{% url 'home' %}">Home Page</a></p>
 <p><a href="{% url 'create-room' %}">Create room</a></p>
 <br>
+{% if request.user.is_authenticated %}
+    <h5>Hello @{{ request.user }} <a href="{% url 'logout_user' %}">Logout</a></h5>
+{% else %}
+    <span><p><a href="{% url 'register' %}">Sign up now!</a> or if you already have an account <a href="{% url 'login_user' %}">Sign in!</a></p></span>
+{% endif %}
 <form method="get" action="{% url 'home' %}">
-    <input type="text" name="q" placeholder="Search for topics or rooms">
+    <input type="text" name="q" placeholder="Search for topics or rooms ">
 </form>
 <hr>

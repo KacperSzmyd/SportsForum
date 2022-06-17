@@ -12,7 +12,7 @@
     <div class="home_page-container">
     <div>
         <div>
-            <p><a href="{% url 'home' %}">All</a></p>
+            <p><a href="{% url 'home' %}">All - {{ topics.count }}</a></p>
         </div>
         {% for topic in topics %}
             <p><a href="{% url 'home' %}?q={{ topic.name }}">{{ topic.name }} - {{ topic.room_set.count }}</a></p>
@@ -20,12 +20,32 @@
     </div>
 
         <div>
+            <div>
+                <h4>{{ rooms_count }} rooms available</h4>
+            </div>
             {% for room in rooms %}
-                <p>@{{ room.host }} <a href="{% url 'update-room' room.id %}">update room</a></p>
+                <p>@{{ room.host }}
+                    {% if request.user == room.host %}
+                        <span><a href="{% url 'update-room' room.id %}">update room</a> <a href="{% url 'delete-room' room.id %}">delete room</a></span>
+                    {% endif %}
+                </p>
                 <p><a href="{% url 'room' room.id %}">{{ room }}</a></p>
                 <p>{{ room.topic }}</p>
                 <hr>
             {% endfor %}
         </div>
+    <div>
+        {% for msg in rooms_messages %}
+            <div>
+                <small>@{{ msg.user }} {{ msg.updated|timesince }}</small>
+                <small>replied to post in ,,<a href="{% url 'home' %}?q={{ msg.room.topic }}">{{ msg.room.topic }}</a>''</small>
+                <p><a href="{% url 'room' msg.room.id %}">{{ msg.room.name}}</a></p>
+                <p>{{ msg.body }}</p>
+                <hr>
+            </div>
+        {% endfor %}
+    </div>
+
+
     </div>
 {% endblock %}
