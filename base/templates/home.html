@@ -24,7 +24,7 @@
                 <h4>{{ rooms_count }} rooms available</h4>
             </div>
             {% for room in rooms %}
-                <p>@{{ room.host }}
+                <p><a href="{% url 'user-profile' room.host.id %}">@{{ room.host }}</a>
                     {% if request.user == room.host %}
                         <span><a href="{% url 'update-room' room.id %}">update room</a> <a href="{% url 'delete-room' room.id %}">delete room</a></span>
                     {% endif %}
@@ -37,10 +37,13 @@
     <div>
         {% for msg in rooms_messages %}
             <div>
-                <small>@{{ msg.user }} {{ msg.updated|timesince }}</small>
+                <small><a href="{% url 'user-profile' msg.user.id %}">@{{ msg.user }}</a> {{ msg.updated|timesince }}</small>
                 <small>replied to post in ,,<a href="{% url 'home' %}?q={{ msg.room.topic }}">{{ msg.room.topic }}</a>''</small>
                 <p><a href="{% url 'room' msg.room.id %}">{{ msg.room.name}}</a></p>
                 <p>{{ msg.body }}</p>
+                {% if msg.user == request.user %}
+                    <small><p><a href="{% url 'delete-message' msg.id %}">delete this message</a></p></small>
+                {% endif %}
                 <hr>
             </div>
         {% endfor %}

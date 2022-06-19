@@ -92,10 +92,10 @@ def update_room(request, pk):
 @login_required(login_url='login_user')
 def delete_room(request, pk):
     room = Room.objects.get(id=pk)
-    if request.method == 'POST':
+    if request.method == 'POST' and room.host == request.user:
         room.delete()
         return redirect('home')
-    context = {'room': room}
+    context = {'object': room}
     return render(request, 'delete.html', context)
 
 
@@ -136,3 +136,37 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect('home')
+
+
+@login_required(login_url='login_user')
+def delete_message(request, pk):
+    user_message = Message.objects.get(id=pk)
+    if request.method == 'POST' and user_message.user == request.user:
+        user_message.delete()
+        return redirect('home')
+
+    context = {'object': user_message}
+    return render(request, 'delete.html', context)
+
+
+def user_profile(request, pk):
+    user = User.objects.get(id=pk)
+
+    context = {'user': user}
+    return render(request, 'profile.html', context)
+
+
+@login_required(login_url='login_user')
+def update_user(request, pk):
+    user = User.objects.get(id=pk)
+    user_form = UserForm(instance=user)
+    if user != request.user:
+        return redirect('home')
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=user)
+        if user_form.is_valid():
+            user_form.save()
+            return redirect('user-profile', pk)
+
+    context = {'user_form': user_form}
+    return render(request, 'profile_form.html', context)

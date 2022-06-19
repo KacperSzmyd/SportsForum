@@ -3,7 +3,7 @@
 {% block content %}
     <form action="" method="post">
         {% csrf_token %}
-        <p>Are you sure, that you want to delete {{ room }}</p>
+        <p>Are you sure, that you want to delete '' {{ object }} ''</p>
         <a href="{{ request.META.HTTP_REFERER }}"> go back</a>
         <input type="submit" value="Confirm">
     </form>

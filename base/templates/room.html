@@ -14,7 +14,7 @@
             {% if request.user == room.host %}
                 <a href="{% url 'delete-room' room.id %}">delete room</a>
             {% endif %}
-            <h5>Host - {{ room.host }}</h5>
+            <h5>Host - <a href="{% url 'user-profile' room.id %}">@{{ room.host }}</a></h5>
             <h3>Topic - {{ room.topic }}</h3>
             <h4>Name: {{ room.name }}</h4>
             <hr>
@@ -36,7 +36,7 @@
         <div>
             <h3>Participants:</h3>
             {% for participant in room_participants %}
-                {{ participant }}
+                <small><p><a href="{% url 'user-profile' participant.id %}">{{ participant }}</a></p></small>
             {% endfor %}
         </div>
     </div>
