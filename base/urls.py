@@ -1,6 +1,4 @@
-
-
-from django.urls import path
+from django.urls import path, include
 from .views import home, room, create_room, update_room, delete_room, register_user, login_user, logout_user, delete_message, user_profile, update_user
 
 urlpatterns = [
@@ -18,5 +16,7 @@ urlpatterns = [
     path('delete-message/<str:pk>/', delete_message, name='delete-message'),
 
     path('user-progile/<str:pk>', user_profile, name='user-profile'),
-    path('update-profile/<str:pk>/', update_user, name='update-user')
+    path('update-profile/<str:pk>/', update_user, name='update-user'),
+
+    path('api/', include('base.api.urls'))
 ]

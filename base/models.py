@@ -1,5 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.utils import timesince
+from rest_framework.authtoken.models import Token
 
 
 class User(AbstractUser):
@@ -12,6 +16,15 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username.title()
+
+    def rooms(self):
+        return [str(room) for room in self.room_set.all()]
+
+
+@receiver(post_save, sender=User)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
 
 
 class Topic(models.Model):
@@ -35,6 +48,9 @@ class Room(models.Model):
 
     def __str__(self):
         return self.name
+
+    def last_action(self):
+        return f'{timesince.timesince(self.updated)} ago'
 
 
 class Message(models.Model):
