@@ -60,6 +60,9 @@ class Message(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    def last_action(self):
+        return f'{timesince.timesince(self.updated)} ago'
+
     class Meta:
         ordering = ['-updated', '-created']
 
